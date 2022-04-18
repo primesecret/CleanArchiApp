@@ -1,13 +1,15 @@
 package kr.co.cleanarchiapp.presentation.login
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.motion.widget.TransitionBuilder.validate
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kr.co.cleanarchiapp.R
@@ -24,34 +26,35 @@ import kr.co.cleanarchiapp.presentation.main.MainActivity
 import kr.co.cleanarchiapp.presentation.register.RegisterActivity
 import javax.inject.Inject
 
-class LoginActivity : AppCompatActivity() {
 
+@AndroidEntryPoint
+class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: LoginViewModel by viewModels()
 
-    @Inject
-    lateinit var sharedPrefs: SharedPrefs
-
-    private val openRegisterActivity = registerForActivityResult(
-                                            ActivityResultContracts.StartActivityForResult()
-                                        ) { result ->
+    private val openRegisterActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             goToMainActivity()
         }
     }
 
+    @Inject
+    lateinit var sharedPrefs: SharedPrefs
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         login()
+        goToRegisterActivity()
         observe()
+
     }
 
     private fun login(){
         binding.loginButton.setOnClickListener {
             val email = binding.emailEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
-            // 정합성 체크
             if(validate(email, password)){
                 val loginRequest = LoginRequest(email, password)
                 viewModel.login(loginRequest)
@@ -70,6 +73,7 @@ class LoginActivity : AppCompatActivity() {
             setPasswordError(getString(R.string.error_password_not_valid))
             return false
         }
+
         return true
     }
 
@@ -102,11 +106,11 @@ class LoginActivity : AppCompatActivity() {
             is LoginActivityState.IsLoading -> handleLoading(state.isLoading)
         }
     }
-    // 로그인 에러 시
+
     private fun handleErrorLogin(response: WrappedResponse<LoginResponse>){
         showGenericAlertDialog(response.message)
     }
-    // 로그인 처리 중
+
     private fun handleLoading(isLoading: Boolean){
         binding.loginButton.isEnabled = !isLoading
         binding.registerButton.isEnabled = !isLoading
@@ -115,23 +119,21 @@ class LoginActivity : AppCompatActivity() {
             binding.loadingProgressBar.progress = 0
         }
     }
-    // 로그인 성공 시
+
     private fun handleSuccessLogin(loginEntity: LoginEntity){
         sharedPrefs.saveToken(loginEntity.token)
         showToast("Welcome ${loginEntity.name}")
         goToMainActivity()
     }
 
-    // 회원가입 화면 호출
     private fun goToRegisterActivity(){
         binding.registerButton.setOnClickListener {
             openRegisterActivity.launch(Intent(this@LoginActivity, RegisterActivity::class.java))
         }
     }
-    // 메인으로 이동
+
     private fun goToMainActivity(){
         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
         finish()
     }
-
 }

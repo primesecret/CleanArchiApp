@@ -32,6 +32,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
         state.value = LoginActivityState.ShowToast(message)
     }
 
+
     fun login(loginRequest: LoginRequest){
         viewModelScope.launch {
             loginUseCase.execute(loginRequest)
@@ -51,6 +52,9 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
                 }
         }
     }
+
+
+
 }
 
 sealed class LoginActivityState  {

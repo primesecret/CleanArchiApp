@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kr.co.cleanarchiapp.BuildConfig
 import kr.co.cleanarchiapp.data.common.utils.RequestInterceptor
 import kr.co.cleanarchiapp.infra.utils.SharedPrefs
 import okhttp3.OkHttpClient
@@ -22,7 +23,7 @@ object NetworkModule {
         return Retrofit.Builder().apply {
             addConverterFactory(GsonConverterFactory.create())
             client(okHttp)
-            baseUrl("")
+            baseUrl(BuildConfig.API_BASE_URL)
         }.build()
     }
 

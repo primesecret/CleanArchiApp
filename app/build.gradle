@@ -21,6 +21,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // default build config
+        buildConfigField 'String', 'API_BASE_URL', '"https://golang-heroku.herokuapp.com/api/"'
     }
 
     buildTypes {
