@@ -23,7 +23,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // default build config
-        buildConfigField 'String', 'API_BASE_URL', '"https://golang-heroku.herokuapp.com/api/"'
+        buildConfigField 'String', 'API_BASE_URL', '"https://192.168.0.9:3000/api/"'
     }
 
     buildTypes {
